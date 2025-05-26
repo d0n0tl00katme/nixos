@@ -3,5 +3,5 @@
 ## Installation
 
 ```
-curl -sL https://github.com/d0n0tl00katme/nixos/install.sh | bash
+curl -sL https://raw.githubusercontent.com/d0n0tl00katme/nixos/master/install.sh | bash
 ```
