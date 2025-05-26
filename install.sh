@@ -12,6 +12,8 @@ echo "Cloning NixOS config from $REPO_URL to $TARGET_DIR..."
 git clone "$REPO_URL" "$TARGET_DIR"
 cd "$TARGET_DIR"
 rm -rf .git
+rm hardware-configuration.nix
+rm flake.lock
 
 echo "Generating hardware configuration..."
 nixos-generate-config --show-hardware-config > hardware-configuration.nix
