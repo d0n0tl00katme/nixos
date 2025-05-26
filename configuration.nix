@@ -72,11 +72,11 @@
 
   # Enable CUPS to print documents.
   # services.printing.enable = true;
-  home-manager = {
-    useUserPackages = true;
-    useGlobalPkgs = true;
-    users.beholder = ./home.nix;
-  };
+  # home-manager = {
+  #   useUserPackages = true;
+  #   useGlobalPkgs = true;
+  #   users.beholder = ./home.nix;
+  # };
 
   services = {
     logind = {
