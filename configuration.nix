@@ -5,14 +5,6 @@
       ./hardware-configuration.nix
     ];
 
-
-  # nixpkgs.config = {
-  #   packageOverrides = pkgs: with pkgs; {
-  #     unstable = import unstableTarball {
-  #       config = config.nixpgs.config;
-  #     };
-  #   };
-  # };
   boot.loader = {
     efi.canTouchEfiVariables = true;
     grub = {
@@ -25,7 +17,6 @@
 
   nixpkgs.config.allowUnfree = true;
   nixpkgs.config.allowUnsupportedSystem = true;
-
 
   hardware = {
     graphics = {
@@ -50,34 +41,8 @@
 
   time.timeZone = "Europe/Moscow";
 
-
   nix.settings.experimental-features = [ "nix-command" "flakes"];
-  # Select internationalisation properties.
-  # i18n.defaultLocale = "en_US.UTF-8";
-  # console = {
-  #   font = "Lat2-Terminus16";
-  #   keyMap = "us";
-  #   useXkbConfig = true;   
-  #};
-
-  # Enable the X11 windowing system.
-  # services.xserver.enable = true;
-
-
   
-
-  # Configure keymap in X11
-  # services.xserver.xkb.layout = "us";
-  # services.xserver.xkb.options = "eurosign:e,caps:escape";
-
-  # Enable CUPS to print documents.
-  # services.printing.enable = true;
-  # home-manager = {
-  #   useUserPackages = true;
-  #   useGlobalPkgs = true;
-  #   users.beholder = ./home.nix;
-  # };
-
   services = {
     logind = {
       lidSwitch = "lock";
@@ -87,9 +52,9 @@
       '';
     };
     libinput.enable = true;
+
     openssh.enable = true;
   
-
     pipewire = {
       enable = true;
       pulse.enable = true;
@@ -100,11 +65,10 @@
       enableHidpi = true;
       theme = "chili";
     };
-    #
+
     xserver = {
       enable = true;
     };
-    #
   };
 
 
@@ -114,7 +78,6 @@
     packages = with pkgs; [];
     shell = pkgs.zsh;
   };
-
 
   programs = {
     zsh.enable = true;
@@ -134,7 +97,6 @@
       ];
     };
  
-
     hyprland = {
       enable = true;
       xwayland.enable = true;
@@ -142,8 +104,6 @@
     };
   };
 
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
   fonts.packages = with pkgs; [
     (nerdfonts.override { fonts = [ 
       "FiraCode"
@@ -226,7 +186,6 @@
       screeninfo
     ]))
 
-    home-manager
     telegram-desktop
     swww    
     hyprlock
@@ -236,12 +195,6 @@
     nwg-look
   ];
 
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
   system.stateVersion = "24.11"; # Did you read the comment?
-
 }
 
