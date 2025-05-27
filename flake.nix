@@ -14,22 +14,32 @@
     };
   };
 
-  outputs = { self, nixpkgs, unstable, home-manager, stylix, ... }@inputs:
-    let
-      system = "x86_64-linux";
-      homeStateVersion = "24.11";
+  outputs = {
+    self,
+    nixpkgs,
+    unstable,
+    home-manager,
+    stylix,
+    ...
+  } @ inputs: let
+    system = "x86_64-linux";
+    homeStateVersion = "24.11";
 
-      # Вынес user в переменную (можно менять из скрипта)
-      user = "beholder";
+    user = "beholder";
 
-      hosts = [
-        {
-          hostname = "thinkpad";
-          stateVersion = homeStateVersion;
-        }
-      ];
+    hosts = [
+      {
+        hostname = "thinkpad";
+        stateVersion = homeStateVersion;
+      }
+    ];
 
-      makeSystem = { hostname, stateVersion, user }: nixpkgs.lib.nixosSystem {
+    makeSystem = {
+      hostname,
+      stateVersion,
+      user,
+    }:
+      nixpkgs.lib.nixosSystem {
         inherit system;
 
         specialArgs = {
@@ -42,20 +52,21 @@
         ];
       };
 
-      systems = builtins.listToAttrs (
-        map (host: {
-          name = host.hostname;
-          value = makeSystem {
-            inherit (host) hostname stateVersion;
-            user = user;  # передаём сюда user
-          };
-        }) hosts
-      );
-
-    in {
-      nixosConfigurations = systems // {
+    systems = builtins.listToAttrs (
+      map (host: {
+        name = host.hostname;
+        value = makeSystem {
+          inherit (host) hostname stateVersion;
+          user = user; # передаём сюда user
+        };
+      })
+      hosts
+    );
+  in {
+    nixosConfigurations =
+      systems
+      // {
         default = systems.thinkpad;
       };
-    };
+  };
 }
-
