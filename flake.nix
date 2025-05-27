@@ -1,55 +1,61 @@
 {
-  description = "My NixOS and Home Manager flake";
+  description = "Govnixos";
 
   inputs = {
-    # Stable (24.11)
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
-    
-    # Unstable
     unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-    
-    # home-manager = {
-    #   url = "github:nix-community/home-manager/release-24.11";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
+    stylix = {
+      url = "github:danth/stylix/release-24.11";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    home-manager = {
+      url = "github:nix-community/home-manager/release-24.11";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, unstable, ... }@inputs:
+  outputs = { self, nixpkgs, unstable, home-manager, stylix, ... }@inputs:
     let
       system = "x86_64-linux";
-      
-      commonArgs = {
-        inherit system;
-        pkgs = nixpkgs.legacyPackages.${system};  # По умолчанию используем stable
-        unstable = unstable.legacyPackages.${system};  # Передаём unstable-пакеты
-      };
+      homeStateVersion = "24.11";
 
-    in {
-      nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
+      # Вынес user в переменную (можно менять из скрипта)
+      user = "beholder";
+
+      hosts = [
+        {
+          hostname = "thinkpad";
+          stateVersion = homeStateVersion;
+        }
+      ];
+
+      makeSystem = { hostname, stateVersion, user }: nixpkgs.lib.nixosSystem {
         inherit system;
-        modules = [ 
-          ./configuration.nix 
-          {
-            _module.args.unstable = unstable.legacyPackages.${system};
-          }
-          # home-manager.nixosModules.home-manager 
-          # {
-          #   home-manager = {
-          #     useGlobalPkgs = true;
-          #     useUserPackages = true;
-          #     users.beholder = import ./home.nix;
-          #   };
-          # }
+
+        specialArgs = {
+          inherit inputs stateVersion hostname user;
+          unstable = unstable.legacyPackages.${system};
+        };
+
+        modules = [
+          ./hosts/${hostname}/configuration.nix
         ];
       };
 
-      # homeConfigurations.beholder = home-manager.lib.homeManagerConfiguration { inherit (commonArgs) pkgs;
-      #   modules = [ 
-      #     ./home.nix 
-      #     {
-      #       _module.args.unstable = unstable.legacyPackages.${system};
-      #     }
-      #   ];
-      # };
+      systems = builtins.listToAttrs (
+        map (host: {
+          name = host.hostname;
+          value = makeSystem {
+            inherit (host) hostname stateVersion;
+            user = user;  # передаём сюда user
+          };
+        }) hosts
+      );
+
+    in {
+      nixosConfigurations = systems // {
+        default = systems.thinkpad;
+      };
     };
 }
+
